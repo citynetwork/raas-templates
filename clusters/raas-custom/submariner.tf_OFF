@@ -1,0 +1,149 @@
+
+///////////////////////
+// SUBMARINER - CLUSTER A/B
+///////////////////////
+
+// Adds new Security Group and rules
+resource "openstack_networking_secgroup_v2" "submariner" {
+  name = "${var.prefix}-submariner"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "in-4500" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "udp"
+  port_range_min = 4500
+  port_range_max = 4500
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.submariner.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "subm-in-500" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "udp"
+  port_range_min = 500
+  port_range_max = 500
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.submariner.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "subm-in-4800" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "udp"
+  port_range_min = 4800
+  port_range_max = 4800
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.submariner.id
+}
+
+// Extends Rancher Security Group defined in security_groups.tf
+resource "openstack_networking_secgroup_rule_v2" "in-4800" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "udp"
+  port_range_min = 4800
+  port_range_max = 4800
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.rancher.id
+}
+
+// Submariner Gateway Node Registration command
+data "template_file" "sub_gw" {
+  template = file("./config/cloud-config.yml")
+  vars = {
+    username = var.customer
+    custom_ssh = openstack_compute_keypair_v2.worker.public_key
+    registration_command = "${rancher2_cluster.custom.cluster_registration_token[0]["node_command"]} --label submariner.io/gateway=true"
+  }
+  depends_on = [rancher2_cluster.custom]
+}
+
+// Submariner Gateway Node
+resource "openstack_compute_instance_v2" "subgw" {
+  name = "${var.prefix}-subgw"
+  image_name = var.node_image
+  flavor_name = "1C-1GB-20GB"
+  key_pair = openstack_compute_keypair_v2.worker.name
+  security_groups = [
+    openstack_networking_secgroup_v2.citynetwork.name,
+    openstack_networking_secgroup_v2.rancher.name
+  ]
+  user_data = data.template_file.sub_gw.rendered
+  config_drive = "true"
+  power_state = "active"
+
+  scheduler_hints {
+    group = openstack_compute_servergroup_v2.anti-affinity.id
+  }
+
+  network {
+    uuid = openstack_networking_network_v2.custom_network.id
+  }
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+}
+
+// Assign Floating IP to Submariner Gateway
+resource "openstack_compute_floatingip_v2" "fip_subgw" {
+  pool = data.openstack_networking_network_v2.external-network.name
+}
+
+resource "openstack_compute_floatingip_associate_v2" "fip_master_assoc" {
+  floating_ip = openstack_compute_floatingip_v2.fip_subgw.address
+  instance_id = openstack_compute_instance_v2.subgw.id
+}
+
+###########################
+# VPNaaS CONNECTION
+###########################
+
+resource "openstack_vpnaas_service_v2" "geo-redundancy" {
+  name = "${var.prefix}-geo-redundancy"
+  router_id = openstack_networking_router_v2.router.id
+  admin_state_up = "true"
+}
+
+resource "openstack_vpnaas_ipsec_policy_v2" "geo-redundancy" {
+  name = "${var.prefix}-geo-redundancy"
+  pfs = "group5"
+  auth_algorithm = "sha1"
+  encryption_algorithm = "aes-128"
+  transform_protocol = "esp"
+  encapsulation_mode = "tunnel"
+}
+
+resource "openstack_vpnaas_ike_policy_v2" "geo-redundancy" {
+  name = "${var.prefix}-geo-redundancy"
+  pfs = "group5"
+  auth_algorithm = "sha1"
+  encryption_algorithm = "aes-128"
+}
+
+resource "openstack_vpnaas_endpoint_group_v2" "local" {
+  name = "${var.prefix}-local"
+  type = "subnet"
+  endpoints = [openstack_networking_subnet_v2.subnet.id]
+}
+
+resource "openstack_vpnaas_endpoint_group_v2" "peer" {
+  name = "${var.prefix}-peer"
+  type = "cidr"
+  endpoints = [var.broker_cidr]
+}
+
+resource "openstack_vpnaas_site_connection_v2" "subgw" {
+  name = "${var.prefix}-subgw"
+  ipsecpolicy_id = openstack_vpnaas_ipsec_policy_v2.geo-redundancy.id
+  ikepolicy_id = openstack_vpnaas_ike_policy_v2.geo-redundancy.id
+  local_ep_group_id = openstack_vpnaas_endpoint_group_v2.local.id
+  peer_ep_group_id  = openstack_vpnaas_endpoint_group_v2.peer.id
+  vpnservice_id = openstack_vpnaas_service_v2.geo-redundancy.id
+  psk = var.vpnaas_psk
+  peer_address = var.broker_router_public_ip
+  peer_id = var.broker_router_public_ip
+  admin_state_up = "true"
+}

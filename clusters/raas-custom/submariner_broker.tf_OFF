@@ -1,0 +1,90 @@
+
+///////////////////////
+// SUBMARINER - BROKER
+///////////////////////
+
+resource "openstack_vpnaas_endpoint_group_v2" "local" {
+  name = "${var.prefix}-local"
+  type = "subnet"
+  endpoints = [openstack_networking_subnet_v2.subnet.id]
+}
+
+resource "openstack_vpnaas_service_v2" "geo-redundancy" {
+  name = "${var.prefix}-geo-redundancy"
+  router_id = openstack_networking_router_v2.router.id
+  admin_state_up = "true"
+}
+
+// Cluster A
+
+resource "openstack_vpnaas_ipsec_policy_v2" "clusterA" {
+  name = "${var.prefix}-geo-redundancy"
+  pfs = "group5"
+  auth_algorithm = "sha1"
+  encryption_algorithm = "aes-128"
+  transform_protocol = "esp"
+  encapsulation_mode = "tunnel"
+}
+
+resource "openstack_vpnaas_ike_policy_v2" "clusterA" {
+  name = "${var.prefix}-geo-redundancy"
+  pfs = "group5"
+  auth_algorithm = "sha1"
+  encryption_algorithm = "aes-128"
+}
+
+resource "openstack_vpnaas_endpoint_group_v2" "clusterA" {
+  name = "${var.prefix}-peer"
+  type = "cidr"
+  endpoints = [var.clusterA_cidr]
+}
+
+resource "openstack_vpnaas_site_connection_v2" "clusterA" {
+  name = "${var.prefix}-geo-redundancy"
+  ipsecpolicy_id = openstack_vpnaas_ipsec_policy_v2.clusterA.id
+  ikepolicy_id = openstack_vpnaas_ike_policy_v2.clusterA.id
+  local_ep_group_id = openstack_vpnaas_endpoint_group_v2.local.id
+  peer_ep_group_id  = openstack_vpnaas_endpoint_group_v2.clusterA.id
+  vpnservice_id = openstack_vpnaas_service_v2.geo-redundancy.id
+  psk = var.vpnaas_psk
+  peer_address = var.clusterA_router_public_ip
+  peer_id = var.clusterA_router_public_ip
+  admin_state_up = "true"
+}
+
+// Cluster B
+
+resource "openstack_vpnaas_ipsec_policy_v2" "clusterB" {
+  name = "${var.prefix}-geo-redundancy"
+  pfs = "group5"
+  auth_algorithm = "sha1"
+  encryption_algorithm = "aes-128"
+  transform_protocol = "esp"
+  encapsulation_mode = "tunnel"
+}
+
+resource "openstack_vpnaas_ike_policy_v2" "clusterB" {
+  name = "${var.prefix}-geo-redundancy"
+  pfs = "group5"
+  auth_algorithm = "sha1"
+  encryption_algorithm = "aes-128"
+}
+
+resource "openstack_vpnaas_endpoint_group_v2" "clusterB" {
+  name = "${var.prefix}-peer"
+  type = "cidr"
+  endpoints = [var.clusterB_cidr]
+}
+
+resource "openstack_vpnaas_site_connection_v2" "clusterB" {
+  name = "${var.prefix}-geo-redundancy"
+  ipsecpolicy_id = openstack_vpnaas_ipsec_policy_v2.clusterB.id
+  ikepolicy_id = openstack_vpnaas_ike_policy_v2.clusterB.id
+  local_ep_group_id = openstack_vpnaas_endpoint_group_v2.local.id
+  peer_ep_group_id  = openstack_vpnaas_endpoint_group_v2.clusterB.id
+  vpnservice_id = openstack_vpnaas_service_v2.geo-redundancy.id
+  psk = var.vpnaas_psk
+  peer_address = var.clusterB_router_public_ip
+  peer_id = var.clusterB_router_public_ip
+  admin_state_up = "true"
+}
