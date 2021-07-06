@@ -10,7 +10,7 @@ resource "rancher2_cluster" "custom" {
       plugin = "canal"
     }
     services {
-      // s3 backup is available only in Kna1, Fra1, Tky1, Dx1
+      // NOTE: ObjectStorage (S3, Swift) is available only in Kna1, Fra1, Tky1, Dx1
       etcd {
         backup_config {
           s3_backup_config {
