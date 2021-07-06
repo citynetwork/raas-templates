@@ -176,3 +176,13 @@ The following commands help remove all Submariner pods from ClusterA, ClusterB a
    $ kubectl --kubeconfig kubeconfig_sto2.yml delete crd clusters.submariner.io endpoints.submariner.io gateways.submariner.io multiclusterservices.lighthouse.submariner.io serviceimports.lighthouse.submariner.io submariners.submariner.io serviceexports.lighthouse.submariner.io http://serviceexports.lighthouse.submariner.io servicediscoveries.submariner.io
    $ kubectl --kubeconfig kubeconfig_sto2.yml delete ns submariner submariner-operator
    ```
+
+# Limitations
+
+1. Object Storage 
+   
+   Currently, object Storage (S3, Swift) is available only in Kna1, Fra1, Tky1, Dx1 in CityCloud. 
+   
+   By default, this configuration uses the Object Storage in the same region where the cluster is running. 
+   
+   The configuration in `buckets.tf` file should then be updated if Object Storage from another region is required.
