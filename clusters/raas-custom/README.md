@@ -1,8 +1,9 @@
 # From Existing Nodes (Custom)
 
-This repo creates a new Kubernetes cluster using RKE, out of existing virtual machines or bare-metal servers.
-It creates all infrastructure resources definition to provision master and worker nodes in CityCloud.
-It then provision a cluster importing and registering the resources as Rancher **Custom** cluster.
+This repo creates a new Kubernetes cluster using RKE in CityCloud.
+It creates all infrastructure resources to provision the cluster's master and worker nodes, registering the resources as Rancher **Custom** cluster.
+
+Read more: https://rancher.com/docs/rancher/v2.x/en/cluster-provisioning/
 
 ## Customization
 The `variables.tf` file contains all custom attributes needed to create a custom environment depending on your
