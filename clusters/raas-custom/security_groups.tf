@@ -10,7 +10,7 @@ resource "openstack_networking_secgroup_rule_v2" "in-22-city" {
   protocol = "tcp"
   port_range_min = 22
   port_range_max = 22
-  remote_ip_prefix = "91.123.199.0/24"
+  remote_ip_prefix = ""
   security_group_id = openstack_networking_secgroup_v2.citynetwork.id
 }
 
