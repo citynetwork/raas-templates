@@ -26,6 +26,10 @@ write_files:
 
 runcmd:
   - apt-get update
+  # Configure automatic updates
+  - echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
+  - apt-get -y install unattended-upgrades
+  # Install Docker
   - apt-get install -y apt-transport-https ca-certificates curl software-properties-common
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
