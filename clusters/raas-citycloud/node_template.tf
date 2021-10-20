@@ -9,6 +9,7 @@ resource "rancher2_cloud_credential" "cred" {
 resource "rancher2_node_template" "citycloud" {
   name = "${lower(data.openstack_identity_auth_scope_v3.scope.project_name)}-${data.openstack_identity_auth_scope_v3.scope.region}-${var.node_flavor}"
   cloud_credential_id = rancher2_cloud_credential.cred.id
+  engine_install_url= "https://releases.rancher.com/install-docker/${var.docker_version}.sh"
   openstack_config {
     availability_zone = ""
     auth_url = "https://${lower(data.openstack_identity_auth_scope_v3.scope.region)}.citycloud.com:5000/v3"
