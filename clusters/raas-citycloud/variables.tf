@@ -35,3 +35,9 @@ variable "vm_image" {
 variable "vm_ssh_user" {
   default = "ubuntu"
 }
+
+// supported docker version can be found at https://github.com/rancher/install-docker
+variable "docker_version" {
+  default = "20.10"
+  description = "The docker version to install on all nodes"
+}
