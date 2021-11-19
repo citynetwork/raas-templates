@@ -14,10 +14,10 @@ resource "rancher2_cluster" "custom" {
       etcd {
         backup_config {
           s3_backup_config {
-            bucket_name = openstack_objectstorage_container_v1.cluster_etcd_backup.name
-            endpoint = "s3-${lower(data.openstack_identity_auth_scope_v3.scope.region)}.citycloud.com:8080"
-            access_key = openstack_identity_ec2_credential_v3.ec2_creds.access
-            secret_key = openstack_identity_ec2_credential_v3.ec2_creds.secret
+            bucket_name = var.cluster_backup_container
+            endpoint = "s3-${var.cluster_backup_region}.citycloud.com:8080"
+            access_key = var.cluster_backup_access
+            secret_key = var.cluster_backup_secret
           }
         }
       }

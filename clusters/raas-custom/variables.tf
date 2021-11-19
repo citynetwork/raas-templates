@@ -32,6 +32,25 @@ variable "cidr" {
   default = "10.1.0.0/24"
 }
 
+// ObjectStorage (S3, Swift) is currently available only in Kna1, Fra1, Tky1, Dx1
+variable "cluster_backup_region" {
+  default = ""
+}
+
+// The container MUST be created manually in the target region as follows:
+//   $ openstack container create <cluster_backup_container>
+variable "cluster_backup_container" {
+  default = ""
+}
+
+variable "cluster_backup_access" {
+  default = ""
+}
+
+variable "cluster_backup_secret" {
+  default = ""
+}
+
 // Master nodes
 
 variable "n_of_master_nodes" {
@@ -64,10 +83,10 @@ variable "ssh_key_worker_nodes" {
 // NETWORKING
 ///////////////////////
 
-// Create a Floating IP manually to avoid any mismatch between DNS <-> IP
+// Create the Floating IP manually to avoid any mismatch between DNS <> LoadBalancer PublicIP
+//  $ openstack floating ip create ext-net
 variable "loadbalancer_ip" {
   default = ""
-
 }
 
 /*
