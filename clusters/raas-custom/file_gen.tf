@@ -1,5 +1,5 @@
 
-resource "local_file" "kube_config" {
+resource "local_sensitive_file" "kube_config" {
   filename = "./gen_files/kubeconfig.yml"
-  sensitive_content = rancher2_cluster.custom.kube_config
+  content = rancher2_cluster.custom.kube_config
 }

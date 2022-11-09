@@ -25,7 +25,7 @@ variable "raas_domain" {
 ///////////////////////
 
 variable "node_image" {
-  default = "Ubuntu 18.04 Bionic Beaver"
+  default = "Ubuntu 20.04 Focal Fossa 20200423"
 }
 
 variable "cidr" {
@@ -62,7 +62,7 @@ variable "flavor_master_nodes" {
 }
 
 variable "ssh_key_master_nodes" {
-  default = "./.secrets/id_rsa_mc"
+  default = "./.secrets/ed25519_mc"
 }
 
 // Worker nodes
@@ -76,9 +76,12 @@ variable "flavor_worker_nodes" {
 }
 
 variable "ssh_key_worker_nodes" {
-  default = "./.secrets/id_rsa_wc"
+  default = "./.secrets/ed25519_wc"
 }
 
+variable "default_user" {
+  default = "ubuntu"
+}
 ///////////////////////
 // NETWORKING
 ///////////////////////
@@ -88,43 +91,3 @@ variable "ssh_key_worker_nodes" {
 variable "loadbalancer_ip" {
   default = ""
 }
-
-/*
-
-///////////////////////
-// SUBMARINER
-///////////////////////
-
-variable "vpnaas_psk" {
-  default = ""
-}
-
-// Cluster A/B
-
-variable "broker_router_public_ip" {
-  default = ""
-}
-
-variable "broker_cidr" {
-  default = ""
-}
-
-// Broker
-
-variable "clusterA_router_public_ip" {
-  default = ""
-}
-
-variable "clusterA_cidr" {
-  default = ""
-}
-
-variable "clusterB_router_public_ip" {
-  default = ""
-}
-
-variable "clusterB_cidr" {
-  default = ""
-}
-
-*/

@@ -9,7 +9,7 @@ resource "openstack_compute_instance_v2" "master" {
     openstack_networking_secgroup_v2.citynetwork.name,
     openstack_networking_secgroup_v2.rancher.name
   ]
-  user_data = data.template_file.master_user_data.rendered
+  user_data = templatefile("./config/cloud-config.yml", { custom_ssh = var.ssh_key_master_nodes, username = var.default_user, registration_command = "${rancher2_cluster.custom.cluster_registration_token[0]["node_command"]} --etcd --controlplane" })
   config_drive = "true"
   power_state = "active"
   scheduler_hints {
@@ -33,7 +33,7 @@ resource "openstack_compute_instance_v2" "worker" {
     openstack_networking_secgroup_v2.citynetwork.name,
     openstack_networking_secgroup_v2.rancher.name
   ]
-  user_data = data.template_file.worker_user_data.rendered
+  user_data = templatefile("./config/cloud-config.yml", { custom_ssh = openstack_compute_keypair_v2.worker.name, username = var.default_user, registration_command = "${rancher2_cluster.custom.cluster_registration_token[0]["node_command"]} --worker" })
   config_drive = "true"
   power_state = "active"
   scheduler_hints {

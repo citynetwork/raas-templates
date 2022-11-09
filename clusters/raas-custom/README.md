@@ -50,7 +50,7 @@ The private key and host username used to access the machines are specified in `
 
 SSH to each machine using:
 ```
-$ ssh -i .secrets/id_rsa <host_username>@<EXTERNAL_IP>
+$ ssh -i .secrets/id_ed25519 <host_username>@<EXTERNAL_IP>
 ```
 
 **_NOTE:_** SSH to the machines restricted to City Network and Customer VPNs only
