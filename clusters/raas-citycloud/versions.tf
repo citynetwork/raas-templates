@@ -1,14 +1,10 @@
 terraform {
   required_providers {
     openstack = {
-      source = "terraform-providers/openstack"
-    }
-    template = {
-      source = "hashicorp/template"
+      source = "terraform-provider-openstack/openstack"
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 1.4"
     }
     null = {
       source = "hashicorp/null"
@@ -17,5 +13,5 @@ terraform {
       source = "rancher/rancher2"
     }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 1.3.3"
 }

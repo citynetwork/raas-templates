@@ -2,8 +2,11 @@
 ///////////////////////
 // ENVIRONMENT VARs
 ///////////////////////
-
 variable "os_password" { type = string }
+variable "os_tenant_name" { type = string }
+variable "os_user_domain_name" { type = string }
+variable "s3_access_key" { type = string }
+variable "s3_secret_key" { type = string }
 
 variable "rancher_access_key" { type = string }
 variable "rancher_secret_key" { type = string }
@@ -21,7 +24,7 @@ variable "raas_domain" {
 }
 
 variable "node_flavor" {
-  default = "2C-4GB-50GB"
+  default = "4C-8GB-50GB"
 }
 
 variable "cidr" {
@@ -29,15 +32,36 @@ variable "cidr" {
 }
 
 variable "vm_image" {
-  default = "Ubuntu 18.04 Bionic Beaver"
+  default = "Ubuntu 22.04 Jammy Jellyfish 20220810"
 }
 
 variable "vm_ssh_user" {
   default = "ubuntu"
 }
 
-// supported docker version can be found at https://github.com/rancher/install-docker
-variable "docker_version" {
-  default = "20.10"
-  description = "The docker version to install on all nodes"
+variable "vm_keypair_name" {
+  default = "citycloud"
+}
+
+variable "ssh_private_key" {
+  default = "./.secrets/id_ed25519"
+}
+
+variable "ssh_public_key" {
+  default = "./.secrets/id_ed25519.pub"
+}
+
+variable "no_master_nodes" {
+  default = "3"
+}
+
+variable "no_worker_nodes" {
+  default = "3"
+}
+
+///////////////////////
+// RANCHER BACKUP
+///////////////////////
+variable "s3_endpoint" {
+  default = "s3endpoint"
 }

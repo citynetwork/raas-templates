@@ -1,30 +1,32 @@
 
-resource "rancher2_cloud_credential" "cred" {
-  name = "${var.prefix}-cred"
+resource "rancher2_cloud_credential" "cloud_credential_name" {
+  name = "${var.prefix}"
   openstack_credential_config {
     password = var.os_password
   }
 }
 
-resource "rancher2_node_template" "citycloud" {
-  name = "${lower(data.openstack_identity_auth_scope_v3.scope.project_name)}-${data.openstack_identity_auth_scope_v3.scope.region}-${var.node_flavor}"
-  cloud_credential_id = rancher2_cloud_credential.cred.id
-  engine_install_url= "https://releases.rancher.com/install-docker/${var.docker_version}.sh"
+resource "rancher2_machine_config_v2" "openstack" {
+  generate_name = "openstack"
   openstack_config {
-    availability_zone = ""
-    auth_url = "https://${lower(data.openstack_identity_auth_scope_v3.scope.region)}.citycloud.com:5000/v3"
+    availability_zone = "nova"
+    auth_url = "https://${lower(data.openstack_identity_auth_scope_v3.scope.region)}.citycloud.com:5000/v3/"
     region = data.openstack_identity_auth_scope_v3.scope.region
     username = data.openstack_identity_auth_scope_v3.scope.user_name
-    // Do NOT use domain_name as it does not work with Openstack ATM
     domain_id = data.openstack_identity_auth_scope_v3.scope.project_domain_id
-    // Do NOT use tenant_name as it does not work with Openstack ATM
-    tenant_id = data.openstack_identity_auth_scope_v3.scope.project_id
-    // Do NOT use net_name as it does not work with Openstack ATM
-    net_id = openstack_networking_network_v2.custom_network.id
     endpoint_type = "publicURL"
-    floating_ip_pool = data.openstack_networking_network_v2.external-network.name
     flavor_name = var.node_flavor
     image_name = var.vm_image
+    keypair_name = var.vm_keypair_name
+    private_key_file = "${var.ssh_private_key}"
+    net_id = openstack_networking_network_v2.custom_network.id
+    password = var.os_password
     ssh_user = var.vm_ssh_user
+    tenant_id = data.openstack_identity_auth_scope_v3.scope.project_id
+  }
+  lifecycle {
+    ignore_changes = [
+      openstack_config.0.volume_size,
+    ]
   }
 }
