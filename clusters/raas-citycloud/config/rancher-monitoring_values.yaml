@@ -1,0 +1,28 @@
+alertmanager:
+  enabled: true
+grafana:
+  enabled: true
+  persistence:
+    accessModes:
+      - ReadWriteOnce
+    enabled: true
+    finalizers:
+      - kubernetes.io/pvc-protection
+    inMemory:
+      enabled: false
+    size: 5Gi
+    type: pvc
+    storageClassName: csi-cinder-sc-delete
+prometheus:
+  enabled: true
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+          storageClassName: csi-cinder-sc-delete
+          volumeMode: Filesystem

@@ -1,8 +1,10 @@
-
 export TF_VAR_os_auth_url=$OS_AUTH_URL/v$OS_AUTH_VERSION
 export TF_VAR_os_region=$OS_REGION_NAME
 export TF_VAR_os_username=$OS_USERNAME
 export TF_VAR_os_password=$OS_PASSWORD
-
+export TF_VAR_os_tenant_name=$OS_TENANT_NAME
+export TF_VAR_os_user_domain_name=$OS_USER_DOMAIN_NAME
+export TF_VAR_s3_access_key=""
+export TF_VAR_s3_secret_key=""
 export TF_VAR_rancher_access_key=""
 export TF_VAR_rancher_secret_key=""

@@ -1,0 +1,16 @@
+cloudConfig:
+  loadBalancer:
+    use-octavia: true
+    floating-network-id: ${ floating_network_id }
+    subnet-id: ${ subnet_id }
+  global:
+    auth-url: ${ endpoint }
+    username: ${ username }
+    password: ${ password }
+    domain-name: ${ domain_name }
+    tenant-name: "${ tenant_name }"
+    region: ${ region }
+  route:
+    router-id: ${ router_id }
+  cluster:
+    name: ${ cluster_name }

@@ -1,0 +1,10 @@
+s3:
+  enabled: true
+  credentialSecretName: s3-credentials
+  credentialSecretNamespace: "cattle-resources-system"
+  region: "${ region }"
+  bucketName: "${ bucket_name }"
+  folder: "/"
+  endpoint: "${ s3_endpoint }"
+  endpointCA: ""
+  insecureTLSSkipVerify: false

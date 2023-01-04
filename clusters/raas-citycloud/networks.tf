@@ -17,3 +17,8 @@ resource "openstack_networking_router_interface_v2" "router-if" {
   router_id = openstack_networking_router_v2.router.id
   subnet_id = openstack_networking_subnet_v2.subnet.id
 }
+
+resource "openstack_compute_keypair_v2" "keypair" {
+  name = var.vm_keypair_name
+  public_key = file(pathexpand(var.ssh_public_key))
+}
